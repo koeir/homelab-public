@@ -114,7 +114,7 @@ root@archiso ~ # mkswap /dev/volgroup0/lv_swap
 
 2. Run `pacstrap -K base /mnt linux linux-firmware` to install base packages.
     - An error stating that `/etc/vconsole.conf` is not found might appear after installing the kernel.
-    - This is fine, but has to be fixed later.
+    - This is fine but has to be fixed later.
 3. Generate fstab and verify results. 
 ```
 root@archiso ~ # mount /dev/volgroup0/lv_root /mnt
@@ -131,7 +131,7 @@ root@archiso ~ # genfstab -U /mnt >> /mnt/etc/fstab
 root@archiso ~ # cat /mnt/etc/fstab
 ```
 > [!NOTE]
-> The `fstab` file contains information about the devices/partitions in your machine's `hard disk`. 
+> The `fstab` file contains information about the mounted partitions in your machine's `hard disk`. 
 > The `-U` flag generates UUIDs for each device, which will be useful later.
 
 ## Arch-Chroot
@@ -173,7 +173,7 @@ root@archiso ~ # cat /mnt/etc/fstab
     ```
     /etc/default/grub
     
-    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 root=/dev/volgroup0/lv_root quiet"
+    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 root=/dev/volgroup0/lv_root resume={lv_swap_UUID} quiet"
     ```
     - If you have swap, you may also set `resume={swap_UUID}`.
 8. Mount the first partition (efi)
@@ -193,25 +193,27 @@ root@archiso ~ # cat /mnt/etc/fstab
     - Research for the optimal parameters. If I'm correct, `--tpm2-device=auto` + default paremeters is sufficient for functionality.
     - Refer to `Trusted Platform Module` documentation.
 5. Set the `LUKS` encrypted partition to be automatically unlocked by `TPM2` in `/etc/crypttab.initramfs`
-> It is recommended read the *ArchWiki* documentation on `dm-crypt/System_configuration` for further details.
 ```
 /etc/crypttab.initramfs
 
 root    UUID={luks_encrypted_partition_UUID}    none    tpm2-device=auto
 ```
-> `root` can be replaced with any name you would like the volume to open as here.
->  The UUID of the encrypted `LUKS` partition can be found by running `lsblk -lf`.
+> [!NOTE]
+> It is recommended read the *ArchWiki* documentation on `dm-crypt/System_configuration` for further details.
+>
+> On a separate note, `root` can be replaced with any name you would like the volume to open as here.
+> The UUID of the encrypted `LUKS` partition can be found by running `lsblk -lf`.
+
 4. Run `mkinitcpio -P` or `mkinitcpio -p linux` again.
 
 ## Final Touches
-1. Enable `NetworkManager`
-    - `systemctl enable NetworkManager`
-3. Create your user
+1. Create your user
     - `useradd -m -g users -G wheel {username}`
     - The `-m` flag adds a home directory for your user, and the `-g` and `-G` flags sets groups and seconday groups for your user respectively.
 > [!NOTE]
-> Add the `wheel` group to the sudoers list later after reboot.
-3. Exit the chroot environment.
-4. Unmount everything
+> Add the `wheel` group to the sudoers list.
+> You can do this now or later after you reboot.
+2. Exit the chroot environment.
+3. Unmount everything
     - `umount -R /mnt`
-5. Reboot. 
+4. Reboot. 
