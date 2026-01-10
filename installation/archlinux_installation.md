@@ -103,14 +103,14 @@ root@archiso ~ # lvcreate -L 4G -n lv_swap volgroup0
 root@archiso ~ # mkswap /dev/volgroup0/lv_swap
 ```
 
+> [!NOTE]
+> `lvm` (found in `cryptsetup open` line), `volgroup0` (found in `vgcreate` line), and volumes starting with `lv_` are *conventional names*. That is to say that they can be replaced with whatever you want.   
+
 ## Mounting & Configuration
 1. Mount the respective partitions and swap
     - `lv_root` should be mounted at `/mnt`;
     - `sda2` (or whatever boot partition) should be mounted at `/mnt/boot`;
     - `swap` (or in this case, `lv_swap`) should be mounted with `swapon {swap_partition}`
-
-> [!NOTE]
-> `lvm` (found in `cryptsetup open` line), `volgroup0` (found in `vgcreate` line), and volumes starting with `lv_` are *conventional names*. That is to say that they can be replaced with whatever you want.   
 
 2. Run `pacstrap -K base /mnt linux linux-firmware` to install base packages.
     - An error stating that `/etc/vconsole.conf` is not found might appear after installing the kernel.
@@ -176,6 +176,10 @@ root@archiso ~ # cat /mnt/etc/fstab
     GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 root=/dev/volgroup0/lv_root resume={lv_swap_UUID} quiet"
     ```
     - If you have swap, you may also set `resume={swap_UUID}`.
+
+> [!NOTE]
+> This part is actually unnecessary. `grub-mkconfig` is smart enough to determine the correct root filesystem.
+
 8. Mount the first partition (efi)
     - `systemctl daemon-reload` might need to be called first; this command must be ran in the installer environment
 9. Install grub/efi
