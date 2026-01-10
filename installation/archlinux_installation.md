@@ -33,9 +33,11 @@ MaxAuthTries            3
 MaxSessions             1
 PasswordAuthentication  no
 ```
+
 > [!NOTE]
 > `{port}` is a placeholder for a port number!!
 2. Restart `sshd.service` until the listening port updates.
+
 ```
 # Repeat until the listening port updates:
 root@archiso ~ # systemctl restart sshd && systemctl status sshd
@@ -75,6 +77,7 @@ sda       8:0    0 931.5G  0 disk
 root@archiso ~ # mkfs.fat -F32 /dev/sda1
 root@archiso ~ # mkfs.ext4 /dev/sda2
 ```
+
 > [!NOTE]
 > It is also possible to encrypt the `/boot` partition, but that requires extra configuration.
 
@@ -114,7 +117,7 @@ root@archiso ~ # mkswap /dev/volgroup0/lv_swap
 
 2. Run `pacstrap -K base /mnt linux linux-firmware` to install base packages.
     - An error stating that `/etc/vconsole.conf` is not found might appear after installing the kernel.
-    - This is fine but has to be fixed later.
+    - This is fine, but has to be fixed later.
 3. Generate fstab and verify results. 
 ```
 root@archiso ~ # mount /dev/volgroup0/lv_root /mnt
@@ -130,8 +133,9 @@ root@archiso ~ # genfstab -U /mnt >> /mnt/etc/fstab
 # Verifying information
 root@archiso ~ # cat /mnt/etc/fstab
 ```
+
 > [!NOTE]
-> The `fstab` file contains information about the mounted partitions in your machine's `hard disk`. 
+> The `fstab` file contains information about the devices/partitions in your machine's `hard disk`. 
 > The `-U` flag generates UUIDs for each device, which will be useful later.
 
 ## Arch-Chroot
@@ -173,7 +177,7 @@ root@archiso ~ # cat /mnt/etc/fstab
     ```
     /etc/default/grub
     
-    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 root=/dev/volgroup0/lv_root resume={lv_swap_UUID} quiet"
+    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 root=/dev/volgroup0/lv_root quiet"
     ```
     - If you have swap, you may also set `resume={swap_UUID}`.
 
@@ -197,11 +201,13 @@ root@archiso ~ # cat /mnt/etc/fstab
     - Research for the optimal parameters. If I'm correct, `--tpm2-device=auto` + default paremeters is sufficient for functionality.
     - Refer to `Trusted Platform Module` documentation.
 5. Set the `LUKS` encrypted partition to be automatically unlocked by `TPM2` in `/etc/crypttab.initramfs`
+> It is recommended read the *ArchWiki* documentation on `dm-crypt/System_configuration` for further details.
 ```
 /etc/crypttab.initramfs
 
 root    UUID={luks_encrypted_partition_UUID}    none    tpm2-device=auto
 ```
+
 > [!NOTE]
 > It is recommended read the *ArchWiki* documentation on `dm-crypt/System_configuration` for further details.
 >
@@ -214,9 +220,10 @@ root    UUID={luks_encrypted_partition_UUID}    none    tpm2-device=auto
 1. Create your user
     - `useradd -m -g users -G wheel {username}`
     - The `-m` flag adds a home directory for your user, and the `-g` and `-G` flags sets groups and seconday groups for your user respectively.
+
 > [!NOTE]
-> Add the `wheel` group to the sudoers list.
-> You can do this now or later after you reboot.
+> Add the `wheel` group to the sudoers list later after reboot.
+
 2. Exit the chroot environment.
 3. Unmount everything
     - `umount -R /mnt`
