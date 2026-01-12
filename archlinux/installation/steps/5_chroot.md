@@ -13,9 +13,10 @@
 
 2. Add necessary hooks to the `/etc/mkinitcpio.conf` file
    - Find the uncommented `HOOKS=` line.
+   - Add `sd-encrypt lvm2`
 
 > [!WARNING]
-> `sd-encrypt lvm2` **ALWAYS** after `block` and before `filesystems`, **in that order**.
+> `sd-encrypt lvm2` should **ALWAYS** go after `block` and before `filesystems`, **in that order**.
 > `sd-encrypt` and `encrypt` are different hooks. For this setup, it is essential to only have `sd-encrypt` from the two.
 
 3. Update the `initramfs`

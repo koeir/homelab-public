@@ -1,12 +1,12 @@
-Arch Linux _minimal installation_ guide with LUKS encrypted
+Ahwclock --systohcrch Linux _minimal installation_ guide with LUKS encrypted
 disk (not including `boot` and `efi`) + TPM2 auto-unlock.
 
 > **[DISCLAIMER]**
 > This guide assumes that your machine is compatible with TPM2.
 > This guide includes commands to follow and explains them, but it is recommended to actually research about each command if you don't already recognize/understand them.
-> This installation does NOT include desktop environments and is designed for home server use.
+> This installation does NOT include desktop environments and is designed for home server use. 
 >
-> I suggest reading the _ArchWiki_ documentation while you follow this guide.
+> I suggest reading the *ArchWiki* documentation while you follow this guide.
 
 # ISO Flashing
 
@@ -72,7 +72,6 @@ local@machine ~ # cat ~/.ssh/archlinux.pub | netcat {arch_machine_ip} {port} -q 
 > You could also use password authentication instead of pubkey authentication. This, of course, is less secure,
 > but is more convenient (especially if you keep messing up and restarting the installation).
 > The key pair generated on the local machine (that is to say **not** the machine you are currently installing Arch on) can be reused later after Arch is installed.
-
 # Disk Partitioning
 
 1. Make partitions for boot, efi, and root filesystem using any partitioning tool.
@@ -84,7 +83,7 @@ local@machine ~ # cat ~/.ssh/archlinux.pub | netcat {arch_machine_ip} {port} -q 
 ```
 root@archiso ~ # fdisk /dev/sda
 
-# This is just a representation of the interactive fdisk-cli,
+# This is just a representation of the interactive fdisk-cli, 
 # it does not look like this exactly.
 [fdisk-interactive]
 # efi
@@ -129,9 +128,8 @@ Device       Start        End    Sectors   Size Type
 > [!NOTE]
 > The `Type` configuration isn't functionally necessary and are just metadata.
 >
-> The _ArchWiki_ docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
+> The *ArchWiki* docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
 > Having a separate `boot` partition also allows you to later encrypt it if you wish.
-
 # Disk Formatting (Boot and ESP)
 
 3. Format the `boot` and `efi system partitions`.
@@ -168,11 +166,10 @@ root@archiso ~ # mkswap /dev/volgroup0/lv_swap
 ```
 
 > [!NOTE]
-> `lvm` (found in `cryptsetup open` line), `volgroup0` (found in `vgcreate` line), and volumes starting with `lv_` are _conventional names_. That is to say that they can be replaced with whatever you want. The `lvm` name is also just a temporary name used for the `cryptsetup open` instance.
+> `lvm` (found in `cryptsetup open` line), `volgroup0` (found in `vgcreate` line), and volumes starting with `lv_` are *conventional names*. That is to say that they can be replaced with whatever you want. The `lvm` name is also just a temporary name used for the `cryptsetup open` instance.
 
 > [!TIP]
-> It is also possible to encrypt the `boot` partition, but that requires extra configuration. It is possible to encrypt the `boot` partition after installation.
-
+> It is also possible to encrypt the `boot` partition, but that requires extra configuration. It is possible to encrypt the `boot` partition after installation. 
 # Mounting
 
 1. Mount the respective partitions and swap
@@ -205,7 +202,6 @@ root@archiso ~ # cat /mnt/etc/fstab
 > [!NOTE]
 > The `fstab` (pronounced _ef-es-tab_) file contains information about the mounted partitions under a specified mountpoint.
 > The `-U` flag makes the `genfstab` command generates UUIDs for each device, which will be useful later.
-
 # Arch-Chroot
 
 ## Installing Packages
@@ -221,9 +217,10 @@ root@archiso ~ # cat /mnt/etc/fstab
 
 2. Add necessary hooks to the `/etc/mkinitcpio.conf` file
    - Find the uncommented `HOOKS=` line.
+   - Add `sd-encrypt lvm2`
 
 > [!WARNING]
-> `sd-encrypt lvm2` **ALWAYS** after `block` and before `filesystems`, **in that order**.
+> `sd-encrypt lvm2` should **ALWAYS** go after `block` and before `filesystems`, **in that order**.
 > `sd-encrypt` and `encrypt` are different hooks. For this setup, it is essential to only have `sd-encrypt` from the two.
 
 3. Update the `initramfs`
@@ -281,24 +278,21 @@ root@archiso ~ # cat /mnt/etc/fstab
 ## Final Touches
 
 11. Create your user
-
-- `useradd -m -g users -G wheel {username}`
-- The `-m` flag adds a home directory for your user, and the `-g` and `-G`
-  flags sets groups and seconday groups for your user respectively.
+   - `useradd -m -g users -G wheel {username}`
+   - The `-m` flag adds a home directory for your user, and the `-g` and `-G`
+     flags sets groups and seconday groups for your user respectively.
 
 > [!NOTE]
 > Add the `wheel` group to the sudoers list. This can be done later after reboot.
 
 12. Exit the chroot environment.
 13. Unmount everything
-
-- `umount -R /mnt`
+   - `umount -R /mnt`
 
 > [!TIP]
 > Re-check if anything is mounted under `/mnt` with `mount`.
 
 14. Reboot.
-
 # Setting Up TPM2
 
 > For this section, I recommend reading the `Trusted Platform Module` and `dm_mod/System_configuration` documentation on ArchWiki.
@@ -335,11 +329,11 @@ root    UUID={luks_encrypted_partition_UUID}    none    tpm2-device=auto
 > It is recommended read the _ArchWiki_ documentation on `dm-crypt/System_configuration` for further details.
 >
 > On a separate note, `root` can be replaced with any name you would like the volume to open as here.
-> Make sure you add the encrypted **partition** (`/dev/sda3` or the 3rd partition made in `./disk_partitioning.md`), not the logical volumes.
+> Make sure you add the encrypted **partition** (`/dev/sda3` or the 3rd partition made in `./disk_partitioning.md`), not the logical volumes. 
 > The UUID of the encrypted `LUKS` partition can be found by running `lsblk -lf`. It should have an `FSTYPE` of `crypto_LUKS` or something similar.
 
 4. Run `mkinitcpio -P` or `mkinitcpio -p linux` again, and you are all set.
-   - This is to make sure that `initramd` knows about `/etc/crypttab.initramfs`
+    - This is to make sure that `initramd` knows about `/etc/crypttab.initramfs`
 
 > [!NOTE]
 > You may also need to update `initramfs` (by running `mkinitcpio`) everytime you change your TPM key.
