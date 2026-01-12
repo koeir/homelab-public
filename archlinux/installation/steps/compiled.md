@@ -5,6 +5,8 @@ disk (not including `boot` and `efi`) + TPM2 auto-unlock.
 > This guide assumes that your machine is compatible with TPM2.
 > This guide includes commands to follow and explains them, but it is recommended to actually research about each command if you don't already recognize/understand them.
 > This installation does NOT include desktop environments and is designed for home server use.
+>
+> I suggest reading the _ArchWiki_ documentation while you follow this guide.
 
 # ISO Flashing
 
@@ -117,15 +119,18 @@ Command: t
 
 2. Run `fdisk -l` to verify everything. The device names might vary, but the `Size`s (of the `boot` and `efi` partitions) and `Type`s and should follow.
 
-> [!NOTE]
-> The `Type` configuration isn't functionally necessary, and are just metadata.
-
 ```
 Device       Start        End    Sectors   Size Type
 /dev/sda1     2048    2099199    2097152     1G Linux filesystem
 /dev/sda2  2099200    4196351    2097152     1G Linux filesystem
 /dev/sda3  4196352 1953523711 1949327360 929.5G Linux LVM
 ```
+
+> [!NOTE]
+> The `Type` configuration isn't functionally necessary and are just metadata.
+>
+> The _ArchWiki_ docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
+> Having a separate `boot` partition also allows you to later encrypt it if you wish.
 
 # Disk Formatting (Boot and ESP)
 
