@@ -4,7 +4,9 @@ disk (not including `boot` and `efi`) + TPM2 auto-unlock.
 > **[DISCLAIMER]**
 > This guide assumes that your machine is compatible with TPM2.
 > This guide includes commands to follow and explains them, but it is recommended to actually research about each command if you don't already recognize/understand them.
-> This installation does NOT include desktop environments and is designed for home server use.
+> This installation does NOT include desktop environments and is designed for home server use. 
+>
+> I suggest reading the *ArchWiki* documentation while you follow this guide.
 
 # ISO Flashing
 

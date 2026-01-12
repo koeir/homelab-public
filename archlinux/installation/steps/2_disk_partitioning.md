@@ -44,12 +44,15 @@ Command: t
 
 2. Run `fdisk -l` to verify everything. The device names might vary, but the `Size`s (of the `boot` and `efi` partitions) and `Type`s and should follow.
 
-> [!NOTE]
-> The `Type` configuration isn't functionally necessary, and are just metadata.
-
 ```
 Device       Start        End    Sectors   Size Type
 /dev/sda1     2048    2099199    2097152     1G Linux filesystem
 /dev/sda2  2099200    4196351    2097152     1G Linux filesystem
 /dev/sda3  4196352 1953523711 1949327360 929.5G Linux LVM
 ```
+
+> [!NOTE]
+> The `Type` configuration isn't functionally necessary and are just metadata.
+>
+> The *ArchWiki* docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
+> Having a separate `boot` partition also allows you to later encrypt it if you wish.
