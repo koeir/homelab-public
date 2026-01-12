@@ -73,7 +73,14 @@
 
 ## Final Touches
 
-11. Create your user
+11. Add a `passwd` to the root user.
+    - Just run `passwd`
+
+> [!WARNING]
+> Make sure this password is secure! The `root` user has access to every single file in the machine.
+> Consider *disabling* the `root` user later and solely rely on `sudo`.
+
+12. Create your user
    - `useradd -m -g users -G wheel {username}`
    - The `-m` flag adds a home directory for your user, and the `-g` and `-G`
      flags sets groups and seconday groups for your user respectively.
@@ -81,11 +88,11 @@
 > [!NOTE]
 > Add the `wheel` group to the sudoers list. This can be done later after reboot.
 
-12. Exit the chroot environment.
-13. Unmount everything
+13. Exit the chroot environment.
+14. Unmount everything
    - `umount -R /mnt`
 
 > [!TIP]
 > Re-check if anything is mounted under `/mnt` with `mount`.
 
-14. Reboot.
+15. Reboot.
