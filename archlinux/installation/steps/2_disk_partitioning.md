@@ -54,5 +54,7 @@ Device       Start        End    Sectors   Size Type
 > [!NOTE]
 > The `Type` configuration isn't functionally necessary and are just metadata.
 >
-> The *ArchWiki* docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
+> `ESP` stands for EFI System Partition. `ESP` and `efi` might interchanged a couple time in this guide, but note that they are not necessarily the same thing. `ESP` refers to the partition where the `efi` or `uefi` resides. 
+>
+> The _ArchWiki_ docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
 > Having a separate `boot` partition also allows you to later encrypt it if you wish.

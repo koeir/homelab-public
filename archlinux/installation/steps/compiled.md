@@ -1,5 +1,11 @@
 Arch Linux _minimal installation_ guide with LUKS encrypted
-disk (not including `boot` and `efi`) + TPM2 auto-unlock.
+
+> [!NOTE]
+> The `Type` configuration isn't functionally necessary and are just metadata.
+>
+> The _ArchWiki_ docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
+> Having a separate `boot` partition also allows you to later encrypt it if you wish.
+> disk (not including `boot` and `efi`) + TPM2 auto-unlock.
 
 > **[DISCLAIMER]**
 > This guide assumes that your machine is compatible with TPM2.
@@ -128,6 +134,8 @@ Device       Start        End    Sectors   Size Type
 
 > [!NOTE]
 > The `Type` configuration isn't functionally necessary and are just metadata.
+>
+> `ESP` stands for EFI System Partition. `ESP` and `efi` might interchanged a couple time in this guide, but note that they are not necessarily the same thing. `ESP` refers to the partition where the `efi` or `uefi` resides.
 >
 > The _ArchWiki_ docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
 > Having a separate `boot` partition also allows you to later encrypt it if you wish.
@@ -267,8 +275,19 @@ root@archiso ~ # cat /mnt/etc/fstab
 > Specifying `root=` is actually unnecessary. `grub-mkconfig` is smart enough to determine the correct root filesystem.
 > If you have swap, consider setting `resume={swap_UUID}`.
 
-7. Mount the first partition (`ESP`)
+7. Make a directory for the `ESP` and mount the first partition.
    - `systemctl daemon-reload` might need to be called first; this command must be ran in the installer environment, as it cannot be ran in `chroot`.
+
+```
+# If it prompts you to run `systemctl daemon-reload`
+[root@archiso /] exit
+root@archiso ~ # systemctl daemon-reload
+root@archiso ~ # arch-chroot /mnt
+
+[root@archiso /] mkdir /boot/EFI
+[root@archiso /] mount /dev/sda1 /boot/EFI
+```
+
 8. Install `grub/efi`
 9. Copy locale to grub
 10. Make grub config file
