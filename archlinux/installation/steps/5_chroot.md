@@ -59,8 +59,20 @@
 > Specifying `root=` is actually unnecessary. `grub-mkconfig` is smart enough to determine the correct root filesystem.
 > If you have swap, consider setting `resume={swap_UUID}`.
 
-7. Mount the first partition (`ESP`)
+
+7. Make a directory for the `ESP` and mount the first partition. 
    - `systemctl daemon-reload` might need to be called first; this command must be ran in the installer environment, as it cannot be ran in `chroot`.
+
+```
+# If it prompts you to run `systemctl daemon-reload`
+[root@archiso /] exit
+root@archiso ~ # systemctl daemon-reload
+root@archiso ~ # arch-chroot /mnt
+
+[root@archiso /] mkdir /boot/EFI
+[root@archiso /] mount /dev/sda1 /boot/EFI
+```
+
 8. Install `grub/efi`
 9. Copy locale to grub
 10. Make grub config file
