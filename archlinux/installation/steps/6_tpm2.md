@@ -1,16 +1,21 @@
 # Setting Up TPM2
 
 > For this section, I recommend reading the `Trusted Platform Module` and `dm_mod/System_configuration` documentation on ArchWiki.
+> This should be done *after* booting into the actual installed Arch Linux operating system, not *during* installation as `root@archiso`.
+> Setting up the TPM2 keys in the installation media causes TPM to read the installation media's PCRs instead of the intended machine.
 
 1. Verify TPM2 support for your device.
    - Refer to the `Trusted Platform Module` documentation on _ArchWiki_.
 2. Enroll a `TPM2` key for the `LUKS` encrypted partition.
-   - `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=5+7+11+15 /dev/sda3`
+   - `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=<pcr_parameters> <luks_crypt partition>`
 
 > [!NOTE]
+> The `--tpm2-pcrs` technically aren't necessary, but should be used for security. 
+> Without the PCR checking, the login authorization can be bypassed by mounting the now-decrypted filesystem on a different and otherwise vulnerable boot device.
+>
 > You can read `TPM2` documentation on what the `--tpm2-pcrs` parameter and specified values are for.
 >
-> Here are short descriptions of 5, 7, 11, 15:
+> I personally recommend 5, 7, 11, 15:
 >
 > `5` detects any modification to the partition table. Ensures that if a malicious actor is messing around with the partitions, the partition isn't automatically unlocked.
 >
@@ -18,7 +23,7 @@
 >
 > `11` detects if the kernel and boot phases. It ensures that the partition isn't automatically unlocked if a malicious actor tampers with the kernel or succeeding boot phases.
 >
-> `15` detects alot of things, but in general, it detects from where the system is booted. This one is highly recommended, maybe even necessary for security. For an in-depth explanation, read the docs, but the main reason why this `PCR` is highly recommended is because it ensures that a malicious attacker can't bypass authorization by booting the machine from a different storage device. I write more about this (somewhere in this repo).
+> `15` detects a lot of things. In general, it detects the machine ID, mount points, and partition and filesystem stuffs. Basically if it's the same booted machine.
 
 3. Set the `LUKS` encrypted partition to be automatically unlocked by `TPM2` in
    `/etc/crypttab.initramfs`
