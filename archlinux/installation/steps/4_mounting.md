@@ -14,7 +14,7 @@ root@archiso ~ # swapon /dev/volgroup0/lv_swap
 # Installing Essential Packages
 
 1. Install base packages and the `linux` kernel (and firmware).
-   - `pacstrap -K base /mnt linux linux-firmware`
+   - `pacstrap -K /mnt base linux linux-firmware`
    - An error stating that `/etc/vconsole.conf` is not found might appear after installing the kernel.
    - This is fine, but has to be fixed later.
 
