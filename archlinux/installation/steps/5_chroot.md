@@ -1,4 +1,5 @@
 # Arch-Chroot
+> chroot can be entered by entering the command `arch-chroot /mnt`
 
 ## Installing Packages
 
