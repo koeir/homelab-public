@@ -24,7 +24,7 @@
    - `mkinitcpio -P` or `mkinitcpio -p linux`
    - If it is looking for file `/etc/vconsole.conf`, it is likely empty or does
      not exist.
-   - If it is either of the conditions above, just run `echo "KEYMAP=us >/etc/vconsole.conf`
+   - If it is either of the conditions above, just run `echo "KEYMAP=us" > /etc/vconsole.conf`
    - or whatever `KEYMAP` you would like.
 
 ## Customizations
