@@ -1,24 +1,18 @@
 Arch Linux _minimal installation_ guide with LUKS encrypted
-
-> [!NOTE]
-> The `Type` configuration isn't functionally necessary and are just metadata.
->
-> The _ArchWiki_ docs only use one partition for `boot` and `ESP`, but this guide separates them for security and compatibility.
-> Having a separate `boot` partition also allows you to later encrypt it if you wish.
-> disk (not including `boot` and `efi`) + TPM2 auto-unlock.
+disk (not including `boot` and `efi`) + TPM2 auto-unlock.
 
 > **[DISCLAIMER]**
 > This guide assumes that your machine is compatible with TPM2.
 > This guide includes commands to follow and explains them, but it is recommended to actually research about each command if you don't already recognize/understand them.
 > This installation does NOT include desktop environments and is designed for home server use.
 >
-> I suggest reading the _ArchWiki_ documentation while you follow this guide.
+> I suggest reading the *ArchWiki* documentation while you follow this guide.
 
 # ISO Flashing
 
 1. Download latest official Arch Linux ISO from the official website.
    - It is recommended to confirm the hash and signature after downloading.
-2. Flash a USB drive or other installation media with the ISO.
+1. Flash a USB drive or other installation media with the ISO.
    - Recommended tool:
      `Rufus`
 
@@ -26,7 +20,7 @@ Arch Linux _minimal installation_ guide with LUKS encrypted
 
 1. Attach the installation media to the machine and enter the boot menu.
    - The boot menu can be opened by (repeatedly) pressing <Esc> while the machine starts up.
-2. Boot the installation media.
+1. Boot the installation media.
    - Try to find the device name of the installation media.
    - If you can't find it initially, try to restart the machine a couple of times.
 
@@ -34,7 +28,7 @@ Arch Linux _minimal installation_ guide with LUKS encrypted
 
 1. Connect to the network with `iwctl` or `mmcli`.
    - If you're having trouble with connecting to networks with special chars in SSIDs, check out `archlinux/installation/troubleshooting/iwctl_ssid_trouble.md`
-2. It is recommended to upgrade `openssh` if planning to continue using `SSH`.
+1. It is recommended to upgrade `openssh` if planning to continue using `SSH`.
    - `pacman -Sy openssh --noconfirm`
 
 ## Setting up SSH (optional)
@@ -57,7 +51,7 @@ PasswordAuthentication  no
 2. Restart `sshd.service` until the listening port updates.
    - `root@archiso ~ # systemctl restart sshd && systemctl status sshd`
    - The logs should say something like `Server listening on 0.0.0.0 port {port}.`
-3. Generate key-pairs on local machine (if haven't already) transfer the public key.
+1. Generate key-pairs on local machine (if haven't already) transfer the public key.
 
 > [!TIP]
 > `netcat` can be used to quickly transfer _public_ keys. Don't use netcat to transfer sensitive information.
@@ -90,7 +84,7 @@ local@machine ~ # cat ~/.ssh/archlinux.pub | netcat {arch_machine_ip} {port} -q 
 ```
 root@archiso ~ # fdisk /dev/sda
 
-# This is just a representation of the interactive fdisk-cli,
+# This is just a representation of the interactive fdisk-cli, 
 # it does not look like this exactly.
 [fdisk-interactive]
 # efi
@@ -152,13 +146,13 @@ root@archiso ~ # mkfs.ext4 /dev/sda2
 ## Encrypted LVM Formatting
 
 1. Format the LVM partition with LUKS.
-2. Open the LUKS partition.
-3. Configure the volumes.
-4. Probe device mapper module.
+1. Open the LUKS partition.
+1. Configure the volumes.
+1. Probe device mapper module.
    - Scan for the volume to confirm; then
    - activate the volume.
-5. Format the logical volume.
-6. (Optionally add swap)
+1. Format the logical volume.
+1. (Optionally add swap)
 
 ```
 root@archiso ~ # cryptsetup luksFormat /dev/sda3
@@ -176,7 +170,7 @@ root@archiso ~ # mkswap /dev/volgroup0/lv_swap
 ```
 
 > [!NOTE]
-> `lvm` (found in `cryptsetup open` line), `volgroup0` (found in `vgcreate` line), and volumes starting with `lv_` are _conventional names_. That is to say that they can be replaced with whatever you want. The `lvm` name is also just a temporary name used for the `cryptsetup open` instance.
+> `lvm` (found in `cryptsetup open` line), `volgroup0` (found in `vgcreate` line), and volumes starting with `lv_` are *conventional names*. That is to say that they can be replaced with whatever you want. The `lvm` name is also just a temporary name used for the `cryptsetup open` instance.
 
 > [!TIP]
 > It is also possible to encrypt the `boot` partition, but that requires extra configuration. It is possible to encrypt the `boot` partition after installation.
@@ -197,7 +191,7 @@ root@archiso ~ # swapon /dev/volgroup0/lv_swap
 # Installing Essential Packages
 
 1. Install base packages and the `linux` kernel (and firmware).
-   - `pacstrap -K base /mnt linux linux-firmware`
+   - `pacstrap -K /mnt base linux linux-firmware`
    - An error stating that `/etc/vconsole.conf` is not found might appear after installing the kernel.
    - This is fine, but has to be fixed later.
 
@@ -215,6 +209,8 @@ root@archiso ~ # cat /mnt/etc/fstab
 > The `-U` flag makes the `genfstab` command generates UUIDs for each device, which will be useful later.
 
 # Arch-Chroot
+
+> chroot can be entered by entering the command `arch-chroot /mnt`
 
 ## Installing Packages
 
@@ -239,12 +235,13 @@ root@archiso ~ # cat /mnt/etc/fstab
    - `mkinitcpio -P` or `mkinitcpio -p linux`
    - If it is looking for file `/etc/vconsole.conf`, it is likely empty or does
      not exist.
-   - If it is either of the conditions above, just run `echo "KEYMAP=us >/etc/vconsole.conf`
+   - If it is either of the conditions above, just run `echo "KEYMAP=us" > /etc/vconsole.conf`
    - or whatever `KEYMAP` you would like.
 
 ## Customizations
 
 4. Set time and locale
+
    - `ln -sf /usr/share/zoneinfo/{Area}/{Location} /etc/localtime`
    - locale can be set in `/etc/locale.gen` by uncommenting a locale (e.g. `en_us.UTF-8 UTF-8`) and running `locale-gen`
    - Update the `LANG` variable in `locale.conf` accordingly
@@ -257,12 +254,14 @@ root@archiso ~ # cat /mnt/etc/fstab
    LANG=en_US.UTF-8
    ```
 
-5. Edit `/etc/hostname` accordingly.
+1. Edit `/etc/hostname` accordingly.
+
    - Just append any name. This will be your device name.
 
 ## Installing and Configuring GRUB
 
 6. Configure GRUB
+
    - Add the `root` values to the `LINUX` line.
 
    ```
@@ -289,8 +288,8 @@ root@archiso ~ # arch-chroot /mnt
 ```
 
 8. Install `grub/efi`
-9. Copy locale to grub
-10. Make grub config file
+1. Copy locale to grub
+1. Make grub config file
 
 ```
 [root@archiso /] grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
@@ -305,7 +304,7 @@ root@archiso ~ # arch-chroot /mnt
 
 > [!WARNING]
 > Make sure this password is secure! The `root` user has access to every single file in the machine.
-> Consider _disabling_ the `root` user later and solely rely on `sudo`.
+> Consider *disabling* the `root` user later and solely rely on `sudo`.
 
 12. Create your user
 
@@ -317,7 +316,7 @@ root@archiso ~ # arch-chroot /mnt
 > Add the `wheel` group to the sudoers list. This can be done later after reboot.
 
 13. Exit the chroot environment.
-14. Unmount everything
+01. Unmount everything
 
 - `umount -R /mnt`
 
@@ -329,16 +328,21 @@ root@archiso ~ # arch-chroot /mnt
 # Setting Up TPM2
 
 > For this section, I recommend reading the `Trusted Platform Module` and `dm_mod/System_configuration` documentation on ArchWiki.
+> This should be done *after* booting into the actual installed Arch Linux operating system, not *during* installation as `root@archiso`.
+> Setting up the TPM2 keys in the installation media causes TPM to read the installation media's PCRs instead of the intended machine.
 
 1. Verify TPM2 support for your device.
    - Refer to the `Trusted Platform Module` documentation on _ArchWiki_.
-2. Enroll a `TPM2` key for the `LUKS` encrypted partition.
-   - `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=5+7+11+15 /dev/sda3`
+1. Enroll a `TPM2` key for the `LUKS` encrypted partition.
+   - `systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=<pcr_parameters> <luks_crypt partition>`
 
 > [!NOTE]
+> The `--tpm2-pcrs` technically aren't necessary, but should be used for security.
+> Without the PCR checking, the login authorization can be bypassed by mounting the now-decrypted filesystem on a different and otherwise vulnerable boot device.
+>
 > You can read `TPM2` documentation on what the `--tpm2-pcrs` parameter and specified values are for.
 >
-> Here are short descriptions of 5, 7, 11, 15:
+> I personally recommend 5, 7, 11, 15:
 >
 > `5` detects any modification to the partition table. Ensures that if a malicious actor is messing around with the partitions, the partition isn't automatically unlocked.
 >
@@ -346,7 +350,7 @@ root@archiso ~ # arch-chroot /mnt
 >
 > `11` detects if the kernel and boot phases. It ensures that the partition isn't automatically unlocked if a malicious actor tampers with the kernel or succeeding boot phases.
 >
-> `15` detects alot of things, but in general, it detects from where the system is booted. This one is highly recommended, maybe even necessary for security. For an in-depth explanation, read the docs, but the main reason why this `PCR` is highly recommended is because it ensures that a malicious attacker can't bypass authorization by booting the machine from a different storage device. I write more about this (somewhere in this repo).
+> `15` detects a lot of things. In general, it detects the machine ID, mount points, and partition and filesystem stuffs. Basically if it's the same booted machine.
 
 3. Set the `LUKS` encrypted partition to be automatically unlocked by `TPM2` in
    `/etc/crypttab.initramfs`
