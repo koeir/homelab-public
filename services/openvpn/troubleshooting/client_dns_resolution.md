@@ -4,10 +4,10 @@ Results in basically **no internet connection**.
 MASQUERADE rules are set up in iptables,
 
 ```
-<SNIP>
+<...SNIP...>
 POSTROUTING
 MASQUERADE  all  --  10.8.0.0/24          anywhere
-<SNIP>
+<...SNIP...>
 ```
 
 dhcp-options are set,
@@ -26,4 +26,19 @@ I have also configured DNS settings on the client (Android) as well:
 2. Changing to a custom DNS;
 3. Overriding the VPN server's DNS; and
 4. Changing clients;
-**and nothing has worked so far.**
+
+# SOLUTION
+2026-2-6
+I have solved it with the help of ChatGPT.
+Turns out, DNS resolution was not the real problem;
+I was missing these FORWARD rules in my iptables:
+
+```
+<...SNIP...>
+FORWARD
+ACCEPT     all  --  10.8.0.0/24          anywhere
+ACCEPT     all  --  anywhere             10.8.0.0/24          state RELATED,ESTABLISHED
+<...SNIP...>
+```
+
+Without these rules, the forwarding couldn't have been made properly.
