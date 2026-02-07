@@ -2,7 +2,7 @@
 
 > For this section, I recommend reading the `Trusted Platform Module` and `dm_mod/System_configuration` documentation on ArchWiki.
 > This should be done *after* booting into the actual installed Arch Linux operating system, not *during* installation as `root@archiso`.
-> Setting up the TPM2 keys in the installation media causes TPM to read the installation media's PCRs instead of the intended machine.
+> Setting up the TPM2 keys in the installation media causes TPM to read the installation media's PCRs instead of the intended drive.
 
 1. Verify TPM2 support for your device.
    - Refer to the `Trusted Platform Module` documentation on _ArchWiki_.
@@ -11,19 +11,25 @@
 
 > [!NOTE]
 > The `--tpm2-pcrs` technically aren't necessary, but should be used for security. 
-> Without the PCR checking, the login authorization can be bypassed by mounting the now-decrypted filesystem on a different and otherwise vulnerable boot device.
+> PCRs are different values measured during and after boot. TPM checks whether the measured PCRs at the time of enrolling the keys are the same as the PCR values of the current boot.
+> If TPM measures a change in one of the locked PCRs, it won't automatically unlock the partition.
+> Without the PCR checking, the encryption is pretty much useless.
 >
-> You can read `TPM2` documentation on what the `--tpm2-pcrs` parameter and specified values are for.
+> Any external/removable drives should be removed before enrolling PCRs. Anything that might not normally be plugged into the machine during/before boot, as these affect the PCR values.
+>
+> The more PCRs you have the slower the boot time may be. Since I'm using my machine as a server, I don't necessarily need a fast boot time, and so I prefer strong security.
+>
+> You should read `TPM2` documentation on what the `--tpm2-pcrs` parameter and specified values are for.
 >
 > I personally recommend 5, 7, 11, 15:
 >
-> `5` detects any modification to the partition table. Ensures that if a malicious actor is messing around with the partitions, the partition isn't automatically unlocked.
+> `5` detects any addition of, removal of, and any modification to the partitions. Ensures that if a malicious actor is messing around with the partitions, the partition isn't automatically unlocked. This PCR measures **all** partitions detected, not just the root filesystem's, therefore it changes if any removable drives that were/weren't connected during enrollment unplugs/plugs. Among other things, this PCR-lock prevents unauthorized access from vulnerable bootable devices (recall mounting the rootfs during installation).
 >
 > `7` detects if the `Secure Boot` state changes. It tracks what the `Secure Boot` state was when the TPM was enrolled. It is recommended to set up `Secure Boot` at a later date. Note that the TPM key has to be wiped and re-enrolled if you change the `Secure Boot` state. If `Secure Boot` is enabled, this ensures that if a malicious actor disables `Secure Boot`, the partition isn't automatically unlocked.
 >
 > `11` detects if the kernel and boot phases. It ensures that the partition isn't automatically unlocked if a malicious actor tampers with the kernel or succeeding boot phases.
 >
-> `15` detects a lot of things. In general, it detects the machine ID, mount points, and partition and filesystem stuffs. Basically if it's the same booted machine.
+> `15` detects a lot of things, and is not strictly defined, so it may differ on different OSes. On Arch, it detects the machine ID, mount points, and partition and filesystem stuffs. I don't strictly recommend this one, but is good for extra security.
 
 3. Set the `LUKS` encrypted partition to be automatically unlocked by `TPM2` in
    `/etc/crypttab.initramfs`
