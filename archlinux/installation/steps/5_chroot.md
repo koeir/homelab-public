@@ -6,9 +6,9 @@
 1. Install _essential_ packages
    - Packages can be installed with `pacman -S package1 package2`
    - Essential list:
-     - grub, efibootmgr, lvm2, sudo
+     - grub efibootmgr sudo lvm2 
    - Personally essential:
-     - git, vim, networkmanager, man, fd, dosfstools, openssh, zsh, gpg, fzf
+     - vim networkmanager man openssh dosfstools git zsh fzf fd gpg 
 
 ## Configuring Initramfs
 
